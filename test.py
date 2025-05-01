@@ -45,21 +45,28 @@ class TestBooksCollector:
 
     def test_get_books_genre_is_not_empty(self):
         collector = BooksCollector()
+        title = 'Призрак дома на холме'
         collector.add_new_book('Призрак дома на холме')
-        assert collector.get_books_genre()
+        assert title in collector.get_books_genre()
 
-    @pytest.mark.parametrize('name, genre', [
-        ('Дракула', 'Ужасы'),
-        ('Голубая книга', 'Комедии')
+    @pytest.mark.parametrize('books', [
+        {
+            'Дракула': 'Ужасы',
+            'Голубая книга': 'Комедии'
+        },
+        {
+            'Дюна': 'Фантастика',
+            'Неуютная ферма': 'Комедии'
+        }
     ]
                              )
-    def test_get_books_for_children(self, name, genre):
+    def test_get_books_for_children(self, books):
         collector = BooksCollector()
-        collector.add_new_book(name)
-        collector.set_book_genre(name, genre)
-        result = genre not in collector.genre_age_rating
-        result = 1 if result else 0
-        assert len(collector.get_books_for_children()) == result
+        for name, genre in books.items():
+            collector.add_new_book(name)
+            collector.set_book_genre(name, genre)
+        result = collector.get_books_for_children()
+        assert all(collector.get_book_genre(item) not in collector.genre_age_rating for item in result)
 
     def test_add_book_in_favorites_success(self):
         collector = BooksCollector()
